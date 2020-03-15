@@ -1,0 +1,35 @@
+version: '2.2'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
+    container_name: es
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ${ES_DATA}:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - fintrack
+  nginx:
+    image: nginx:1.17.2
+    container_name: nginx
+    volumes:
+      - ${NGINX_CONF}:/etc/nginx/nginx.conf
+      - ${NGINX_DIR}:/usr/share/nginx
+    ports:
+      - 8080:8080
+    networks:
+      - fintrack
+
+networks:
+  fintrack:
+    driver: bridge
